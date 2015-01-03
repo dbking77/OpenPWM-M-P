@@ -19,13 +19,17 @@
 ##
 
 PROGRAM = openpwm-m-p
-MCU = attiny25
+MCU = attiny85
+AVRDUDE_MCU = -p t85
 CC = avr-gcc
 OBJCOPY = avr-objcopy
 OBJDUMP = avr-objdump
 CFLAGS += -Wall -ggdb -Os -mmcu=$(MCU)
 LDFLAGS +=
 OBJS = $(PROGRAM).o
+
+# Programming device for AVRDUDE
+AVRDUDE_PROG = -c avrispv2 -P /dev/ttyACM0
 
 # Be silent per default, but 'make V=1' will show all compiler calls.
 ifneq ($(V),1)
@@ -53,7 +57,15 @@ $(PROGRAM).hex: $(PROGRAM).elf
 
 flash: $(PROGRAM).hex
 	@printf "  FLASH   $(PROGRAM).hex\n"
-	$(Q)avrdude -c avrispv2 -P usb -p t13 -U flash:w:$(PROGRAM).hex
+	$(Q)avrdude $(AVRDUDE_PROG) $(AVRDUDE_MCU) -U flash:w:$(PROGRAM).hex
+
+write_fuse:
+	@printf "  FUSES\n"
+	$(Q)avrdude $(AVRDUDE_PROG) $(AVRDUDE_MCU) -U lfuse:w:0xe2:m -U hfuse:w:0xdf:m -U efuse:w:0xff:m
+
+read_fuse:
+	@printf "  READING FUSES\n"
+	$(Q)avrdude $(AVRDUDE_PROG) $(AVRDUDE_MCU) -U lfuse:r:lfuse.txt:h -U hfuse:r:hfuse.txt:h -U efuse:r:efuse.txt:h
 
 clean:
 	@printf "  CLEAN   $(subst $(shell pwd)/,,$(OBJS))\n"
