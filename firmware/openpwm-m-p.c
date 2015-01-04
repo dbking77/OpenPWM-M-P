@@ -217,6 +217,7 @@ int main(void)
   sei();
 
 
+  int16_t filtered_duty = 0;
   uint8_t flash_count = 0;
   while (1)
   {
@@ -225,35 +226,62 @@ int main(void)
     {
       g_overflow_flag = 0;
       ++flash_count;
-    }
 
-    // pwm pulse width is volatile (changed by interrupt) so read it only once before using it
-    int16_t pulse_width = g_pwm_pulse_width; 
-    if (pulse_width == 0)
-    {
-      PORTB |= (1<<LED_PIN);
-      disableMotor();
-    }
-    else 
-    {
-      // Scale and offset PWM pulse with so that 1.9us pulse produces duty of 255, 
-      //   and 1.1ms pulse produces duty of -255
-      // 1 LSB of pulse width is nominally 8uSec ( 1/8Mhz * 64 = 8usec)
-      // zero throttle is about 1.5ms, which is 187.5 (1.5msec/8usec = 187.5)
-      int16_t duty = (int16_t)pulse_width - 187;
-      // Range on PWM pulse is 1.9-1.1 = 0.8ms = 100.
-      // rescale PWM so that pulse of -50 becomes -255 and +50 becomes 255
-      //  We want to multiply duty by 5.1 (255/50 = 5.1)
-      //  To get same result multiple duty by 5.1*8 and shift left by 3 to divide by 8
-      //    50*41>>3 = 256 
-      duty = (duty*41) >> 3;
-      setMotorOutput(duty);
-
-      // When getting good signal, flash LED slowly
-      if (flash_count > 100)
+      // pwm pulse width is volatile (changed by interrupt) so read it only once before using it
+      int16_t pulse_width = g_pwm_pulse_width; 
+      if (pulse_width == 0)
       {
-        flash_count = 0;
-        PORTB ^= (1<<LED_PIN);
+        PORTB |= (1<<LED_PIN);
+        disableMotor();
+        filtered_duty = 0;
+      }
+      else 
+      {
+        // Scale and offset PWM pulse with so that 1.9us pulse produces duty of 255, 
+        //   and 1.1ms pulse produces duty of -255
+        // 1 LSB of pulse width is nominally 8uSec ( 1/8Mhz * 64 = 8usec)
+        // zero throttle is about 1.5ms, which is 187.5 (1.5msec/8usec = 187.5)
+        int16_t duty = (int16_t)pulse_width - 187;
+
+        // Range on PWM pulse is 1.9-1.1 = 0.8ms = 100.
+        //   rescale PWM so that pulse of -50 becomes -255 and +50 becomes 255
+        //   We want to multiply duty by 5.1 (255/50 = 5.1)
+        //   To get same result multiple duty by 5.1*8 and shift left by 3 to divide by 8
+        //     50*41>>3 = 256
+        //duty = (duty*41) >> 3;
+
+        // Range on mixed PWM pulse is 1.65 to 1.35 or 0.3 = 37.5
+        //   resalce PWM pulse so that 37.5/2 = 255 
+        //     (37.5/2 * 27)>>1 = 253      
+        duty = (duty*27) >> 1;
+
+        // filter duty a bit
+        duty = (3*filtered_duty + duty) >> 2;
+
+        // Limit how quickly duty can change
+        int16_t diff = duty - filtered_duty;
+        const int16_t max_diff = 4;
+        if (diff > max_diff)
+        {
+          filtered_duty += max_diff;
+        }
+        else if (diff < -max_diff)
+        {
+          filtered_duty -= max_diff;
+        }
+        else
+        {
+          filtered_duty = duty;
+        }
+
+        setMotorOutput(filtered_duty);
+
+        // When getting good signal, flash LED slowly
+        if (flash_count > 100)
+        {
+          flash_count = 0;
+          PORTB ^= (1<<LED_PIN);
+        }
       }
     }
   }
