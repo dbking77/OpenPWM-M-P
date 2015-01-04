@@ -259,7 +259,7 @@ int main(void)
 
         // Limit how quickly duty can change
         int16_t diff = duty - filtered_duty;
-        const int16_t max_diff = 5;
+        const int16_t max_diff = 4;
         if (diff > max_diff)
         {
           filtered_duty += max_diff;
