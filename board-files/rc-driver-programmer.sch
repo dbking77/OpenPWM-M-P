@@ -5733,17 +5733,6 @@ type 0309, grid 2.5 mm</description>
 </library>
 <library name="mgregg">
 <packages>
-<package name="SO-8EP">
-<smd name="P$1" x="-2.04" y="-2.54" dx="0.802" dy="1.505" layer="1"/>
-<smd name="P$2" x="-0.77" y="-2.54" dx="0.802" dy="1.505" layer="1"/>
-<smd name="P$3" x="0.5" y="-2.54" dx="0.802" dy="1.505" layer="1"/>
-<smd name="P$4" x="1.77" y="-2.54" dx="0.802" dy="1.505" layer="1"/>
-<smd name="P$8" x="-2.04" y="2.455" dx="0.802" dy="1.505" layer="1"/>
-<smd name="P$7" x="-0.77" y="2.455" dx="0.802" dy="1.505" layer="1"/>
-<smd name="P$6" x="0.5" y="2.455" dx="0.802" dy="1.505" layer="1"/>
-<smd name="P$5" x="1.77" y="2.455" dx="0.802" dy="1.505" layer="1"/>
-<smd name="PAD" x="-0.14" y="-0.04" dx="3.5" dy="2.6" layer="1"/>
-</package>
 <package name="DIL08">
 <description>&lt;B&gt;Dual In Line&lt;/B&gt;</description>
 <wire x1="-5.08" y1="-0.635" x2="-5.08" y2="0.635" width="0.1524" layer="21" curve="180"/>
@@ -5805,20 +5794,6 @@ type 0309, grid 2.5 mm</description>
 </package>
 </packages>
 <symbols>
-<symbol name="ZXBM5210-MOTOR-DRIVER">
-<pin name="V-REF" x="-17.78" y="2.54" length="middle"/>
-<pin name="VIN-LOGIC" x="-17.78" y="0" length="middle"/>
-<pin name="FWD" x="-17.78" y="-2.54" length="middle"/>
-<pin name="REV" x="-17.78" y="-5.08" length="middle"/>
-<pin name="VIN-MOTOR" x="20.32" y="2.54" length="middle" rot="R180"/>
-<pin name="MOTOR-1" x="20.32" y="0" length="middle" rot="R180"/>
-<pin name="MOTOR-2" x="20.32" y="-2.54" length="middle" rot="R180"/>
-<pin name="GND" x="20.32" y="-5.08" length="middle" rot="R180"/>
-<wire x1="-12.7" y1="5.08" x2="-12.7" y2="-7.62" width="0.254" layer="94"/>
-<wire x1="-12.7" y1="-7.62" x2="15.24" y2="-7.62" width="0.254" layer="94"/>
-<wire x1="15.24" y1="-7.62" x2="15.24" y2="5.08" width="0.254" layer="94"/>
-<wire x1="15.24" y1="5.08" x2="-12.7" y2="5.08" width="0.254" layer="94"/>
-</symbol>
 <symbol name="5-I/O-1">
 <wire x1="-12.7" y1="-7.62" x2="12.7" y2="-7.62" width="0.254" layer="94"/>
 <wire x1="12.7" y1="-7.62" x2="12.7" y2="7.62" width="0.254" layer="94"/>
@@ -5837,28 +5812,6 @@ type 0309, grid 2.5 mm</description>
 </symbol>
 </symbols>
 <devicesets>
-<deviceset name="ZXBM5210-MOTOR-DRIVER">
-<gates>
-<gate name="G$1" symbol="ZXBM5210-MOTOR-DRIVER" x="-7.62" y="-5.08"/>
-</gates>
-<devices>
-<device name="" package="SO-8EP">
-<connects>
-<connect gate="G$1" pin="FWD" pad="P$4"/>
-<connect gate="G$1" pin="GND" pad="P$8 PAD"/>
-<connect gate="G$1" pin="MOTOR-1" pad="P$1"/>
-<connect gate="G$1" pin="MOTOR-2" pad="P$7"/>
-<connect gate="G$1" pin="REV" pad="P$5"/>
-<connect gate="G$1" pin="V-REF" pad="P$6"/>
-<connect gate="G$1" pin="VIN-LOGIC" pad="P$3"/>
-<connect gate="G$1" pin="VIN-MOTOR" pad="P$2"/>
-</connects>
-<technologies>
-<technology name=""/>
-</technologies>
-</device>
-</devices>
-</deviceset>
 <deviceset name="TINY22" prefix="IC">
 <description>&lt;b&gt;MICROCONTROLLER&lt;/b&gt;&lt;p&gt;
 1K ROM&lt;p&gt;
@@ -7431,12 +7384,11 @@ Source: www.kingbright.com</description>
 <part name="C3" library="resistor" deviceset="C-US" device="C0805" value="0.1uf"/>
 <part name="JP1" library="pinhead" deviceset="PINHD-1X3" device=""/>
 <part name="JP3" library="pinhead" deviceset="PINHD-1X2" device=""/>
-<part name="U$1" library="mgregg" deviceset="ZXBM5210-MOTOR-DRIVER" device=""/>
 <part name="IC1" library="mgregg" deviceset="TINY22" device="S"/>
 <part name="THERM1" library="resistor" deviceset="R-US_" device="R0603" value="4.7k"/>
 <part name="R1" library="resistor" deviceset="R-US_" device="R0603" value="20k"/>
-<part name="R2" library="resistor" deviceset="R-US_" device="R0603"/>
-<part name="R3" library="resistor" deviceset="R-US_" device="R0603"/>
+<part name="R2" library="resistor" deviceset="R-US_" device="R0603" value="27k"/>
+<part name="R3" library="resistor" deviceset="R-US_" device="R0603" value="10k"/>
 <part name="R4" library="resistor" deviceset="R-US_" device="R0603"/>
 <part name="LED1" library="led" deviceset="LED" device="CHIP-LED0603"/>
 <part name="JP2" library="pinhead" deviceset="PINHD-1X2" device=""/>
@@ -7453,7 +7405,6 @@ Source: www.kingbright.com</description>
 <instance part="C3" gate="G$1" x="10.16" y="83.82"/>
 <instance part="JP1" gate="A" x="-40.64" y="-2.54"/>
 <instance part="JP3" gate="G$1" x="53.34" y="-2.54"/>
-<instance part="U$1" gate="G$1" x="-2.54" y="22.86"/>
 <instance part="IC1" gate="G$1" x="0" y="55.88"/>
 <instance part="THERM1" gate="G$1" x="-40.64" y="76.2"/>
 <instance part="R1" gate="G$1" x="-27.94" y="76.2"/>
@@ -7485,11 +7436,6 @@ Source: www.kingbright.com</description>
 <pinref part="IC1" gate="G$1" pin="GND"/>
 <wire x1="-17.78" y1="50.8" x2="-33.02" y2="50.8" width="0.1524" layer="91"/>
 <label x="-27.94" y="50.8" size="1.778" layer="95"/>
-</segment>
-<segment>
-<pinref part="U$1" gate="G$1" pin="GND"/>
-<wire x1="17.78" y1="17.78" x2="38.1" y2="17.78" width="0.1524" layer="91"/>
-<label x="27.94" y="17.78" size="1.778" layer="95"/>
 </segment>
 <segment>
 <pinref part="R1" gate="G$1" pin="2"/>
@@ -7524,11 +7470,6 @@ Source: www.kingbright.com</description>
 <label x="63.5" y="78.74" size="1.778" layer="95"/>
 </segment>
 <segment>
-<pinref part="U$1" gate="G$1" pin="VIN-MOTOR"/>
-<wire x1="17.78" y1="25.4" x2="38.1" y2="25.4" width="0.1524" layer="91"/>
-<label x="27.94" y="25.4" size="1.778" layer="95"/>
-</segment>
-<segment>
 <pinref part="JP2" gate="G$1" pin="1"/>
 <wire x1="20.32" y1="-15.24" x2="-2.54" y2="-15.24" width="0.1524" layer="91"/>
 <label x="0" y="-15.24" size="1.778" layer="95"/>
@@ -7549,11 +7490,6 @@ Source: www.kingbright.com</description>
 <pinref part="IC1" gate="G$1" pin="VCC"/>
 <wire x1="-17.78" y1="53.34" x2="-33.02" y2="53.34" width="0.1524" layer="91"/>
 <label x="-27.94" y="53.34" size="1.778" layer="95"/>
-</segment>
-<segment>
-<pinref part="U$1" gate="G$1" pin="VIN-LOGIC"/>
-<wire x1="-20.32" y1="22.86" x2="-33.02" y2="22.86" width="0.1524" layer="91"/>
-<label x="-30.48" y="22.86" size="1.778" layer="95"/>
 </segment>
 <segment>
 <pinref part="THERM1" gate="G$1" pin="1"/>
@@ -7594,11 +7530,6 @@ Source: www.kingbright.com</description>
 <wire x1="50.8" y1="-2.54" x2="33.02" y2="-2.54" width="0.1524" layer="91"/>
 <label x="35.56" y="-2.54" size="1.778" layer="95"/>
 </segment>
-<segment>
-<pinref part="U$1" gate="G$1" pin="MOTOR-2"/>
-<wire x1="17.78" y1="20.32" x2="38.1" y2="20.32" width="0.1524" layer="91"/>
-<label x="27.94" y="20.32" size="1.778" layer="95"/>
-</segment>
 </net>
 <net name="MOTOR1-1" class="0">
 <segment>
@@ -7606,18 +7537,8 @@ Source: www.kingbright.com</description>
 <wire x1="50.8" y1="0" x2="33.02" y2="0" width="0.1524" layer="91"/>
 <label x="35.56" y="0" size="1.778" layer="95"/>
 </segment>
-<segment>
-<pinref part="U$1" gate="G$1" pin="MOTOR-1"/>
-<wire x1="17.78" y1="22.86" x2="38.1" y2="22.86" width="0.1524" layer="91"/>
-<label x="27.94" y="22.86" size="1.778" layer="95"/>
-</segment>
 </net>
 <net name="REV" class="0">
-<segment>
-<pinref part="U$1" gate="G$1" pin="REV"/>
-<wire x1="-20.32" y1="17.78" x2="-33.02" y2="17.78" width="0.1524" layer="91"/>
-<label x="-30.48" y="17.78" size="1.778" layer="95"/>
-</segment>
 <segment>
 <pinref part="IC1" gate="G$1" pin="(MOSI)PB0"/>
 <wire x1="17.78" y1="50.8" x2="35.56" y2="50.8" width="0.1524" layer="91"/>
@@ -7630,11 +7551,6 @@ Source: www.kingbright.com</description>
 </segment>
 </net>
 <net name="FWD" class="0">
-<segment>
-<pinref part="U$1" gate="G$1" pin="FWD"/>
-<wire x1="-20.32" y1="20.32" x2="-33.02" y2="20.32" width="0.1524" layer="91"/>
-<label x="-30.48" y="20.32" size="1.778" layer="95"/>
-</segment>
 <segment>
 <pinref part="IC1" gate="G$1" pin="(MISO)PB1"/>
 <wire x1="17.78" y1="53.34" x2="35.56" y2="53.34" width="0.1524" layer="91"/>
@@ -7673,17 +7589,6 @@ Source: www.kingbright.com</description>
 <label x="25.4" y="60.96" size="1.778" layer="95"/>
 </segment>
 </net>
-<net name="N$1" class="0">
-<segment>
-<pinref part="U$1" gate="G$1" pin="V-REF"/>
-<pinref part="R3" gate="G$1" pin="1"/>
-<wire x1="-20.32" y1="25.4" x2="-33.02" y2="25.4" width="0.1524" layer="91"/>
-<wire x1="-33.02" y1="25.4" x2="-33.02" y2="38.1" width="0.1524" layer="91"/>
-<pinref part="R2" gate="G$1" pin="2"/>
-<wire x1="-33.02" y1="38.1" x2="-35.56" y2="38.1" width="0.1524" layer="91"/>
-<junction x="-33.02" y="38.1"/>
-</segment>
-</net>
 <net name="N$2" class="0">
 <segment>
 <pinref part="IC1" gate="G$1" pin="(CLOCK)PB3"/>
@@ -7696,6 +7601,13 @@ Source: www.kingbright.com</description>
 <pinref part="R4" gate="G$1" pin="1"/>
 <pinref part="LED1" gate="G$1" pin="A"/>
 <wire x1="55.88" y1="48.26" x2="55.88" y2="45.72" width="0.1524" layer="91"/>
+</segment>
+</net>
+<net name="N$4" class="0">
+<segment>
+<pinref part="R2" gate="G$1" pin="2"/>
+<pinref part="R3" gate="G$1" pin="1"/>
+<wire x1="-33.02" y1="38.1" x2="-35.56" y2="38.1" width="0.1524" layer="91"/>
 </segment>
 </net>
 </nets>
