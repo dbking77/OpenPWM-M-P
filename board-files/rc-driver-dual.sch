@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <!DOCTYPE eagle SYSTEM "eagle.dtd">
-<eagle version="7.2.0">
+<eagle version="7.1.0">
 <drawing>
 <settings>
 <setting alwaysvectorfont="no"/>
@@ -75,13 +75,13 @@
 <smd name="P$12" x="0" y="2.54" dx="0.4" dy="1.9" layer="1" rot="R180"/>
 <smd name="P$13" x="-1.27" y="2.54" dx="0.4" dy="1.9" layer="1" rot="R180"/>
 <smd name="P$14" x="-2.54" y="2.54" dx="0.4" dy="1.9" layer="1" rot="R180"/>
-<wire x1="-3.19" y1="2.66" x2="-5.14" y2="2.66" width="0.127" layer="21"/>
-<wire x1="-5.14" y1="2.66" x2="-5.14" y2="-2.54" width="0.127" layer="21"/>
-<wire x1="-5.14" y1="-2.54" x2="-3.19" y2="-2.54" width="0.127" layer="21"/>
-<wire x1="5.86" y1="-2.54" x2="7.16" y2="-2.54" width="0.127" layer="21"/>
-<wire x1="7.16" y1="-2.54" x2="7.16" y2="2.66" width="0.127" layer="21"/>
-<wire x1="7.16" y1="2.66" x2="5.86" y2="2.66" width="0.127" layer="21"/>
-<circle x="-4.04" y="-1.34" radius="0.67081875" width="0.127" layer="21"/>
+<wire x1="-3.19" y1="2.66" x2="-3.54" y2="2.66" width="0.127" layer="21"/>
+<wire x1="-3.54" y1="2.66" x2="-3.54" y2="-2.54" width="0.127" layer="21"/>
+<wire x1="-3.54" y1="-2.54" x2="-3.19" y2="-2.54" width="0.127" layer="21"/>
+<wire x1="5.86" y1="-2.54" x2="6" y2="-2.54" width="0.127" layer="21"/>
+<wire x1="6" y1="-2.54" x2="6" y2="2.66" width="0.127" layer="21"/>
+<wire x1="6" y1="2.66" x2="5.86" y2="2.66" width="0.127" layer="21"/>
+<circle x="-2.67" y="-0.74" radius="0.67081875" width="0.127" layer="21"/>
 </package>
 <package name="TSSOP-16-LP">
 <smd name="P$1" x="-2.07" y="-3.24" dx="0.45" dy="1.8" layer="1"/>
@@ -7660,9 +7660,9 @@ Source: www.kingbright.com</description>
 <label x="48.26" y="71.12" size="1.778" layer="95"/>
 </segment>
 <segment>
-<pinref part="SV1" gate="1" pin="6"/>
-<wire x1="124.46" y1="55.88" x2="104.14" y2="55.88" width="0.1524" layer="91"/>
-<label x="106.68" y="55.88" size="1.778" layer="95"/>
+<pinref part="SV1" gate="1" pin="1"/>
+<wire x1="124.46" y1="68.58" x2="104.14" y2="68.58" width="0.1524" layer="91"/>
+<label x="106.68" y="68.58" size="1.778" layer="95"/>
 </segment>
 </net>
 <net name="MOTOR2-1" class="0">
@@ -7672,9 +7672,9 @@ Source: www.kingbright.com</description>
 <label x="48.26" y="73.66" size="1.778" layer="95"/>
 </segment>
 <segment>
-<pinref part="SV1" gate="1" pin="5"/>
-<wire x1="124.46" y1="58.42" x2="104.14" y2="58.42" width="0.1524" layer="91"/>
-<label x="106.68" y="58.42" size="1.778" layer="95"/>
+<pinref part="SV1" gate="1" pin="2"/>
+<wire x1="124.46" y1="66.04" x2="104.14" y2="66.04" width="0.1524" layer="91"/>
+<label x="106.68" y="66.04" size="1.778" layer="95"/>
 </segment>
 </net>
 <net name="MOTOR1-2" class="0">
@@ -7684,9 +7684,9 @@ Source: www.kingbright.com</description>
 <label x="48.26" y="76.2" size="1.778" layer="95"/>
 </segment>
 <segment>
-<pinref part="SV1" gate="1" pin="2"/>
-<wire x1="124.46" y1="66.04" x2="104.14" y2="66.04" width="0.1524" layer="91"/>
-<label x="106.68" y="66.04" size="1.778" layer="95"/>
+<pinref part="SV1" gate="1" pin="5"/>
+<wire x1="124.46" y1="58.42" x2="104.14" y2="58.42" width="0.1524" layer="91"/>
+<label x="106.68" y="58.42" size="1.778" layer="95"/>
 </segment>
 </net>
 <net name="MOTOR1-1" class="0">
@@ -7696,9 +7696,9 @@ Source: www.kingbright.com</description>
 <label x="48.26" y="78.74" size="1.778" layer="95"/>
 </segment>
 <segment>
-<pinref part="SV1" gate="1" pin="1"/>
-<wire x1="124.46" y1="68.58" x2="104.14" y2="68.58" width="0.1524" layer="91"/>
-<label x="106.68" y="68.58" size="1.778" layer="95"/>
+<pinref part="SV1" gate="1" pin="6"/>
+<wire x1="124.46" y1="55.88" x2="104.14" y2="55.88" width="0.1524" layer="91"/>
+<label x="106.68" y="55.88" size="1.778" layer="95"/>
 </segment>
 </net>
 <net name="VM" class="0">
