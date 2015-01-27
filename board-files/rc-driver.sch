@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <!DOCTYPE eagle SYSTEM "eagle.dtd">
-<eagle version="7.1.0">
+<eagle version="7.2.0">
 <drawing>
 <settings>
 <setting alwaysvectorfont="no"/>
@@ -7327,6 +7327,12 @@ Source: www.kingbright.com</description>
 <sheet>
 <plain>
 <text x="-45.72" y="-10.16" size="1.778" layer="94">rc-in-1</text>
+<text x="-109.22" y="-15.24" size="5.08" layer="91" ratio="17">By: Michael Gregg</text>
+<text x="-96.52" y="-22.86" size="5.08" layer="91" ratio="17">Derek King</text>
+<text x="33.02" y="-17.78" size="5.08" layer="91" ratio="17">OpenPWM</text>
+<text x="33.02" y="-25.4" size="5.08" layer="91" ratio="17">https://github.com/cinchcircuits/OpenPWM-M-P</text>
+<text x="33.02" y="-33.02" size="5.08" layer="91" ratio="17">Released Under TAPR Hardware License</text>
+<text x="33.02" y="-40.64" size="5.08" layer="91" ratio="17">http://www.tapr.org/ohl.html</text>
 </plain>
 <instances>
 <instance part="C1" gate="G$1" x="53.34" y="83.82"/>

@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <!DOCTYPE eagle SYSTEM "eagle.dtd">
-<eagle version="7.1.0">
+<eagle version="7.2.0">
 <drawing>
 <settings>
 <setting alwaysvectorfont="no"/>
@@ -7627,10 +7627,19 @@ Source: www.kingbright.com</description>
 <part name="LED1" library="led" deviceset="LED" device="CHIPLED_0603"/>
 <part name="THERM" library="resistor" deviceset="R-US_" device="R0603"/>
 <part name="R7" library="resistor" deviceset="R-US_" device="R0603"/>
+<part name="R6" library="resistor" deviceset="R-US_" device="R0603"/>
+<part name="LED2" library="led" deviceset="LED" device="CHIPLED_0603"/>
 </parts>
 <sheets>
 <sheet>
 <plain>
+<text x="43.18" y="7.62" size="5.08" layer="91">OpenPWM-Dual</text>
+<text x="43.18" y="0" size="5.08" layer="91">https://github.com/cinchcircuits/OpenPWM-M-P</text>
+<text x="43.18" y="-7.62" size="5.08" layer="91">Released under the TAPR License:</text>
+<text x="43.18" y="-15.24" size="5.08" layer="91">http://www.tapr.org/ohl.html</text>
+<text x="-53.34" y="0" size="5.08" layer="91">Revision 1.0</text>
+<text x="-53.34" y="-7.62" size="5.08" layer="91">Michael Gregg</text>
+<text x="-53.34" y="-15.24" size="5.08" layer="91">Derek King</text>
 </plain>
 <instances>
 <instance part="U$1" gate="G$1" x="22.86" y="20.32"/>
@@ -7649,6 +7658,8 @@ Source: www.kingbright.com</description>
 <instance part="LED1" gate="G$1" x="111.76" y="25.4" rot="R90"/>
 <instance part="THERM" gate="G$1" x="81.28" y="127"/>
 <instance part="R7" gate="G$1" x="99.06" y="127"/>
+<instance part="R6" gate="G$1" x="93.98" y="40.64"/>
+<instance part="LED2" gate="G$1" x="109.22" y="40.64" rot="R90"/>
 </instances>
 <busses>
 </busses>
@@ -7777,20 +7788,18 @@ Source: www.kingbright.com</description>
 <wire x1="124.46" y1="60.96" x2="104.14" y2="60.96" width="0.1524" layer="91"/>
 <label x="106.68" y="60.96" size="1.778" layer="95"/>
 </segment>
+<segment>
+<pinref part="LED2" gate="G$1" pin="C"/>
+<wire x1="114.3" y1="40.64" x2="127" y2="40.64" width="0.1524" layer="91"/>
+<label x="119.38" y="40.64" size="1.778" layer="95"/>
+</segment>
 </net>
 <net name="LED" class="0">
-<segment>
-<pinref part="U$1" gate="G$1" pin="PA3"/>
-<wire x1="12.7" y1="22.86" x2="0" y2="22.86" width="0.1524" layer="91"/>
-<label x="2.54" y="22.86" size="1.778" layer="95"/>
-</segment>
 <segment>
 <pinref part="R5" gate="G$1" pin="1"/>
 <wire x1="91.44" y1="25.4" x2="76.2" y2="25.4" width="0.1524" layer="91"/>
 <label x="81.28" y="25.4" size="1.778" layer="95"/>
 </segment>
-</net>
-<net name="N$20" class="0">
 <segment>
 <pinref part="U$1" gate="G$1" pin="PA4"/>
 <wire x1="12.7" y1="20.32" x2="0" y2="20.32" width="0.1524" layer="91"/>
@@ -7867,11 +7876,6 @@ Source: www.kingbright.com</description>
 <pinref part="SV3" gate="G$1" pin="1"/>
 <wire x1="-50.8" y1="33.02" x2="-35.56" y2="33.02" width="0.1524" layer="91"/>
 <label x="-45.72" y="33.02" size="1.778" layer="95"/>
-</segment>
-<segment>
-<pinref part="U$1" gate="G$1" pin="PA2"/>
-<wire x1="12.7" y1="25.4" x2="0" y2="25.4" width="0.1524" layer="91"/>
-<label x="2.54" y="25.4" size="1.778" layer="95"/>
 </segment>
 </net>
 <net name="OUTPUT1" class="0">
@@ -7982,6 +7986,32 @@ Source: www.kingbright.com</description>
 <pinref part="U$1" gate="G$1" pin="PA0"/>
 <wire x1="12.7" y1="30.48" x2="0" y2="30.48" width="0.1524" layer="91"/>
 <label x="2.54" y="30.48" size="1.778" layer="95"/>
+</segment>
+</net>
+<net name="N$3" class="0">
+<segment>
+<pinref part="LED2" gate="G$1" pin="A"/>
+<pinref part="R6" gate="G$1" pin="2"/>
+<wire x1="106.68" y1="40.64" x2="99.06" y2="40.64" width="0.1524" layer="91"/>
+</segment>
+</net>
+<net name="LED2" class="0">
+<segment>
+<pinref part="R6" gate="G$1" pin="1"/>
+<wire x1="88.9" y1="40.64" x2="73.66" y2="40.64" width="0.1524" layer="91"/>
+<label x="78.74" y="40.64" size="1.778" layer="95"/>
+</segment>
+<segment>
+<pinref part="U$1" gate="G$1" pin="PA3"/>
+<wire x1="12.7" y1="22.86" x2="0" y2="22.86" width="0.1524" layer="91"/>
+<label x="2.54" y="22.86" size="1.778" layer="95"/>
+</segment>
+</net>
+<net name="N$5" class="0">
+<segment>
+<pinref part="U$1" gate="G$1" pin="PA2"/>
+<wire x1="12.7" y1="25.4" x2="0" y2="25.4" width="0.1524" layer="91"/>
+<label x="2.54" y="25.4" size="1.778" layer="95"/>
 </segment>
 </net>
 </nets>
