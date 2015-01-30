@@ -7629,6 +7629,8 @@ Source: www.kingbright.com</description>
 <part name="R7" library="resistor" deviceset="R-US_" device="R0603"/>
 <part name="R6" library="resistor" deviceset="R-US_" device="R0603"/>
 <part name="LED2" library="led" deviceset="LED" device="CHIPLED_0603"/>
+<part name="C4" library="resistor" deviceset="C-US" device="C1206" value="10uf"/>
+<part name="C5" library="resistor" deviceset="C-US" device="C0603" value="0.1uf"/>
 </parts>
 <sheets>
 <sheet>
@@ -7660,6 +7662,8 @@ Source: www.kingbright.com</description>
 <instance part="R7" gate="G$1" x="99.06" y="127"/>
 <instance part="R6" gate="G$1" x="93.98" y="40.64"/>
 <instance part="LED2" gate="G$1" x="109.22" y="40.64" rot="R90"/>
+<instance part="C4" gate="G$1" x="12.7" y="116.84"/>
+<instance part="C5" gate="G$1" x="53.34" y="116.84"/>
 </instances>
 <busses>
 </busses>
@@ -7723,6 +7727,12 @@ Source: www.kingbright.com</description>
 <wire x1="43.18" y1="119.38" x2="22.86" y2="119.38" width="0.1524" layer="91"/>
 <pinref part="C1" gate="G$1" pin="1"/>
 <label x="30.48" y="119.38" size="1.778" layer="95"/>
+<pinref part="C4" gate="G$1" pin="1"/>
+<wire x1="12.7" y1="119.38" x2="22.86" y2="119.38" width="0.1524" layer="91"/>
+<pinref part="C5" gate="G$1" pin="1"/>
+<wire x1="43.18" y1="119.38" x2="53.34" y2="119.38" width="0.1524" layer="91"/>
+<junction x="43.18" y="119.38"/>
+<junction x="22.86" y="119.38"/>
 </segment>
 <segment>
 <pinref part="SV1" gate="1" pin="3"/>
@@ -7757,10 +7767,16 @@ Source: www.kingbright.com</description>
 <pinref part="C1" gate="G$1" pin="2"/>
 <pinref part="C2" gate="G$1" pin="2"/>
 <wire x1="0" y1="111.76" x2="-12.7" y2="111.76" width="0.1524" layer="91"/>
-<wire x1="22.86" y1="111.76" x2="0" y2="111.76" width="0.1524" layer="91"/>
+<wire x1="22.86" y1="111.76" x2="12.7" y2="111.76" width="0.1524" layer="91"/>
 <label x="-12.7" y="111.76" size="1.778" layer="95"/>
 <junction x="22.86" y="111.76"/>
 <junction x="0" y="111.76"/>
+<pinref part="C4" gate="G$1" pin="2"/>
+<wire x1="12.7" y1="111.76" x2="0" y2="111.76" width="0.1524" layer="91"/>
+<junction x="12.7" y="111.76"/>
+<pinref part="C5" gate="G$1" pin="2"/>
+<wire x1="43.18" y1="111.76" x2="53.34" y2="111.76" width="0.1524" layer="91"/>
+<junction x="43.18" y="111.76"/>
 </segment>
 <segment>
 <pinref part="R1" gate="G$1" pin="2"/>
