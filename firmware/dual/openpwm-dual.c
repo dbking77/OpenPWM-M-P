@@ -178,12 +178,57 @@ void setMotor1(int16_t duty)
   }
 }
 
+/**
+ * Set duty for motor2 (out3 and out4)
+ *    value of 255 = full forward
+ *    value of -255 = full reverse
+ *    value of 0 = stop/brake
+ * 
+ * out1 = PB2 = OC0A
+ * out2 = PA7 = OC0B
+ */
+void setMotor2(int16_t duty)
+{
+  // Enable outputs, by enable PWM control of pins
+  // set A & B outputs to non-inverting (for fast PWM)
+  // in non-inverting mode pins are SET at BOTTOM
+  enum { T1_COMv = 2 }; 
+
+  TCCR1A |= (T1_COMv<<COM0A0) | (T1_COMv<<COM0B0);
+
+  if (duty>0xFF)
+  {
+    duty = 0xFF;
+  }
+  else if (duty < -0xFF)
+  {
+    duty = -0xFF;
+  }
+
+  if (duty < 0)
+  {
+    OCR1A = duty;
+    OCR1B = 0xFF; // 0xFF high always
+  }
+  else 
+  {    
+    OCR1A = 0xFF; // 0xFF high always
+    OCR1B = 0xFF-duty;
+  }
+}
+
+
 void disableMotor1()
 {
   // Disable outputs be switching pins to normal operation.
   // Out1 and out2 will PORT are already set to 0, so output will
   // high-Z and motor will coast
   TCCR0A &= 0x0F;  // Clears COM0A and COM0B (top 4 bits)
+}
+
+void disableMotor2()
+{
+  TCCR1A &= 0x0F;
 }
 
 
@@ -198,6 +243,16 @@ int main(void)
   TCCR0A = (T0_WGMv&3);
   TCCR0B = ((T0_WGMv>>2)<<WGM02) | T0_CSv;
 
+  // Enable PWM mode on timer 1.  Have timer saturate at 0xFF
+  enum { T1_WGMv = 5 }; //fast PWM mode use 0xFF as TOP
+  enum { T1_CSv = 1 };  //use internal clock with no prescalling
+  TCCR1A = (T1_WGMv&3);
+  TCCR1B = ((T1_WGMv>>2)<<WGM12) | T1_CSv;
+
+  // Have timers run 180degrees out-of-phase to reduce supply ripple
+  TCNT0 = 0;
+  TCNT1 = 0x7F;
+
   // Enable interrupts
   //sei();
 
@@ -206,6 +261,7 @@ int main(void)
   while (1)
   {
     setMotor1(duty);
+    setMotor2(duty);
     duty+=direction;
     if ((direction > 0) && (duty > 300))
     {
