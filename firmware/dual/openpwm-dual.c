@@ -204,8 +204,7 @@ void setMotor2(int16_t duty)
   // set A & B outputs to non-inverting (for fast PWM)
   // in non-inverting mode pins are set at BOTTOM, and cleared on compare match
   enum { T1_COMv = 2 }; 
-
-  TCCR1A |= (T1_COMv<<COM0A0) | (T1_COMv<<COM0B0);
+  TCCR1A |= (T1_COMv<<COM1A0) | (T1_COMv<<COM1B0);
 
   // Staturate duty between -0xFF and 0xFF
   if (duty > 0xFF)
@@ -332,6 +331,7 @@ struct ServoPwm
   // pulse width measurement value of 8000 = 1ms.
   // value of zero is special and indicates valid value
   volatile uint16_t pulse_width;
+  int16_t average_pulse_width;
   uint16_t rising_edge_time;
   volatile uint8_t no_signal_cycles;
   char valid_rising_edge; // true if rising edge was captured recently
@@ -340,7 +340,13 @@ struct ServoPwm
 // Clock frequency is 8Mhz, centered pulse width is usually 1.5ms
 //   1.5ms = 1500us :  1500us * 8Mhz = 1500*8
 //   DX5e output varies from 1.1 to 1.9ms
-enum {MIN_SERVO_PULSE_WIDTH=800*8, MAX_SERVO_PULSE_WIDTH=2200*8};
+enum 
+{
+  MIN_VALID_SERVO_PULSE_WIDTH = 800*8, 
+  CENTER_SERVO_PULSE_WIDTH    = 1500*8,
+  MAX_VALID_SERVO_PULSE_WIDTH = 2200*8,
+  SERVO_DEADZONE_WIDTH        = 75*8,
+};
 
 // Number of 2ms cycles before servo signal is assumed to be *lost*
 enum {LOST_SERVO_SIGNAL_CYCLES=100};
@@ -362,12 +368,12 @@ char timeoutServoPwm(struct ServoPwm* pwm, uint16_t time)
   // This means invalid pulse widths might seems to be valid.  
   // To prevent longer pulse from aliasing to shorter values, this code will
   // measure the difference between the current time, and last rising edge time,
-  // if the time difference is larger than the MAX_SERVO_PULSE_WIDTH, 
+  // if the time difference is larger than the MAX_VALID_SERVO_PULSE_WIDTH, 
   // it will clear the valid_rising_edge flag
   if (pwm->valid_rising_edge) 
   {
     uint16_t width = time - pwm->rising_edge_time;
-    if (width > MAX_SERVO_PULSE_WIDTH)
+    if (width > MAX_VALID_SERVO_PULSE_WIDTH)
     {
       pwm->valid_rising_edge = 0;
     }
@@ -404,7 +410,7 @@ void updateServoPwm(struct ServoPwm* pwm, uint16_t time, char rising)
     pwm->valid_rising_edge = 0;
     // falling edge with valid rising edge, determine pulse width
     uint16_t width = time - pwm->rising_edge_time;
-    if ((width >= MIN_SERVO_PULSE_WIDTH) && (width <= MAX_SERVO_PULSE_WIDTH))
+    if ((width >= MIN_VALID_SERVO_PULSE_WIDTH) && (width <= MAX_VALID_SERVO_PULSE_WIDTH))
     {
       // pulse width seems valid
       pwm->pulse_width = width;
@@ -416,6 +422,38 @@ void updateServoPwm(struct ServoPwm* pwm, uint16_t time, char rising)
       LED1_PORT ^= (1<<LED1_PIN);
     }
   }
+}
+
+/** Get servo pulse width 
+ * pulse width is rescaled and has a dead-zone removed
+ */
+int16_t getAvgServoPulseWidth(struct ServoPwm *pwm)
+{
+  // make sure read of pulse width is atomic
+  cli();
+  int16_t new_width = pwm->pulse_width;
+  sei();
+
+  int16_t width = pwm->average_pulse_width;
+  width += (new_width-width)>>4;
+  pwm->average_pulse_width = width;
+
+  // offset pulse widths so values so output   
+  width-=CENTER_SERVO_PULSE_WIDTH;
+  
+  if (width > SERVO_DEADZONE_WIDTH)
+  {
+    width -= SERVO_DEADZONE_WIDTH;
+  }
+  else if (width < -SERVO_DEADZONE_WIDTH)
+  {
+    width += SERVO_DEADZONE_WIDTH;
+  }
+  else
+  {
+    width = 0;
+  }
+  return width;
 }
 
 
@@ -457,7 +495,6 @@ ISR(PCINT0_vect)
 }
 
 
-
 int main(void)
 {
   gpioInit();
@@ -470,8 +507,8 @@ int main(void)
   TCCR0B = ((T0_WGMv>>2)<<WGM02) | T0_CSv;
 
   // Enable PWM mode on timer 1.  Have timer saturate at 0xFF
-  enum { T1_WGMv = 3 }; //fast PWM mode use 0xFF as TOP
-  enum { T1_CSv = 4 };  //use internal clock with no prescalling
+  enum { T1_WGMv = 5 }; //fast PWM mode use 0xFF as TOP
+  enum { T1_CSv = 1 };  //use internal clock with no prescalling
   TCCR1A = (T1_WGMv&3);
   TCCR1B = ((T1_WGMv>>2)<<WGM12) | T1_CSv;
 
@@ -517,13 +554,31 @@ int main(void)
           LED2_PORT |= (1<<LED2_PIN);
 
           // calculate new duty values from servo values
-          setMotor1(0);
-          setMotor2(0);
+          // assume:
+          //  pwm2 = forward/reverse
+          //  pwm1 = rotate
+          int16_t forward = getAvgServoPulseWidth(&pwm2);
+          int16_t rotate  = getAvgServoPulseWidth(&pwm1);
+
+          // range on forward and reverse values is typically 
+          // -400*8 to 400*8 for Spektrum DX5 and 8Mhz clock
+
+          // scale forward value  so that max forward value 400*8 is now 1024
+          forward = (forward * 5)>>4;
+          
+          // scale rotate so that that max value 400 is now 1024
+          rotate = (rotate * 5)>>4;
+
+          int16_t duty1 = forward - rotate;
+          int16_t duty2 = forward + rotate;
+
+          setMotor1(-duty1>>2);
+          setMotor2(duty2>>2);
         }
       } // end if (ovf_counter > 62)
     } // end if (tim0_ovf_flag)
 
-  }
+  } // end while(1)
 
   return 0;
 }
