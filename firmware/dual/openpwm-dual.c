@@ -242,56 +242,14 @@ void disableMotors()
 
 
 volatile uint8_t tim0_ovf_count = 0;
+volatile char tim0_ovf_flag;
 ISR(TIM0_OVF_vect)
 {
-  //LED2_PORT |= (1<<LED2_PIN);
+  tim0_ovf_flag = 1;
   ++tim0_ovf_count;
-  //LED2_PORT &=~ (1<<LED2_PIN);
 }
 
 
-struct ServoPwm
-{
-  // pulse width measurement value of 8000 = 1ms.
-  // value of zero is special and indicates valid value
-  uint16_t pulse_width;
-  uint16_t rising_edge_cnt;
-  char valid_rising_edge; // true if rising edge was captured recently
-
-  // Assume minimum value pulse width is 0.5ms and max is 2.5ms
-  // 8MHz * 0.5ms = 4000
-  // 8Mhz * 2.5ms = 20000
-} pwm1, pwm2;
-
-//enum {MIN_SERVO_PULSE_WIDTH=4000, MAX_SERVO_PULSE_WIDTH=20000};
-enum {MIN_SERVO_PULSE_WIDTH=8000, MAX_SERVO_PULSE_WIDTH=16000};
-
-
-void updateServoPwm(struct ServoPwm* pwm, uint16_t cnt, char rising)
-{
-  if (rising)
-  {
-    // rising edge
-    pwm->valid_rising_edge = 1;
-    pwm->rising_edge_cnt = cnt;    
-  }
-  else if (pwm->valid_rising_edge)
-  {
-    LED2_PORT ^= (1<<LED2_PIN);
-    pwm->valid_rising_edge = 0;
-    // falling edge with valid rising edge, determine pulse width
-    uint16_t width = cnt - pwm->rising_edge_cnt;
-    if ((width >= MIN_SERVO_PULSE_WIDTH) && (width <= MAX_SERVO_PULSE_WIDTH))
-    {
-      // pulse width seems valid
-      pwm->pulse_width = width;
-    }
-    else
-    {
-      LED1_PORT ^= (1<<LED1_PIN);
-    }
-  }
-}
 
 // Prevent compiler from moving memory access operations across this code
 #define MEMBAR() __asm volatile( "" ::: "memory" );
@@ -319,7 +277,7 @@ void updateServoPwm(struct ServoPwm* pwm, uint16_t cnt, char rising)
  *    17a:	d0 93 6d 00 	sts	0x006D, r29
  *    17e:	c0 93 6c 00 	sts	0x006C, r2
  */
-union Counter16
+union Timer16
 {
   uint16_t val;
   struct 
@@ -329,22 +287,13 @@ union Counter16
 };
 
 
+
 /**
- * Use pin change interrupt and TIM0 to measure input PWM pulse width
- * this uses a combination of TCNT0 and TIM0 overflow interrupt to
- * generate a 16bit timestamp value that alows a servo pulse between
- * 1 and 2ms to be measured.
- * 
- * PA1 : PWM1 : PCINT1
- * PA2 : PWM2 : PCINT2
+ * Returns 16bit timestamp generated from TCNT0
  */
-uint8_t pcint_last_in;
-ISR(PCINT0_vect)
+uint16_t getTimestamp()
 {
-  // Read hardware registers immediately and in exact order specified
-  uint8_t in = PINA; // read pin A
-  MEMBAR();
-  union Counter16 cnt;
+  union Timer16 cnt;
   cnt.lo = TCNT0;
   MEMBAR();
   cnt.hi = tim0_ovf_count;
@@ -370,9 +319,123 @@ ISR(PCINT0_vect)
   // in this case the overflow counter is correct.
   if ((tifr & (1<<TOV0)) && (cnt.lo & 0x80))
   {
-    union Counter16 cnt;
     ++cnt.hi;
+    // debug toggle LED everytime this occurs
+    //LED2_PORT ^= (1<<LED2_PIN);
   }
+  return cnt.val;
+}
+
+
+struct ServoPwm
+{
+  // pulse width measurement value of 8000 = 1ms.
+  // value of zero is special and indicates valid value
+  volatile uint16_t pulse_width;
+  uint16_t rising_edge_time;
+  volatile uint8_t no_signal_cycles;
+  char valid_rising_edge; // true if rising edge was captured recently
+} pwm1, pwm2;
+
+// Clock frequency is 8Mhz, centered pulse width is usually 1.5ms
+//   1.5ms = 1500us :  1500us * 8Mhz = 1500*8
+//   DX5e output varies from 1.1 to 1.9ms
+enum {MIN_SERVO_PULSE_WIDTH=800*8, MAX_SERVO_PULSE_WIDTH=2200*8};
+
+// Number of 2ms cycles before servo signal is assumed to be *lost*
+enum {LOST_SERVO_SIGNAL_CYCLES=100};
+
+/**
+ * Should be called from mainloop about every 2milliseconds, in order to 
+ * detect bad pulse-widths or a loss of servo signal
+ * 
+ * returns true if servo signal seems to be lost
+ */
+char timeoutServoPwm(struct ServoPwm* pwm, uint16_t time)
+{
+  // Since clock runs at 8Mhz, every 8.192ms the 16bit timestamp will wrap around.
+  // Any pulse longer than 8.192ms will not be measured properly because
+  // the difference between rising and falling edges will be large than a 16bit value
+  //
+  // Instead a long pulse width will alias as a shorter measurement.
+  // For example a 9.192ms pulse will be alias to a 1ms pulse.
+  // This means invalid pulse widths might seems to be valid.  
+  // To prevent longer pulse from aliasing to shorter values, this code will
+  // measure the difference between the current time, and last rising edge time,
+  // if the time difference is larger than the MAX_SERVO_PULSE_WIDTH, 
+  // it will clear the valid_rising_edge flag
+  if (pwm->valid_rising_edge) 
+  {
+    uint16_t width = time - pwm->rising_edge_time;
+    if (width > MAX_SERVO_PULSE_WIDTH)
+    {
+      pwm->valid_rising_edge = 0;
+    }
+  }
+
+  // every time this is called to increment no signal cycles
+  cli();
+  uint8_t no_signal_cycles = pwm->no_signal_cycles+1;
+  char lost_signal = (no_signal_cycles >= LOST_SERVO_SIGNAL_CYCLES);
+  if (!lost_signal)
+  {
+    // only write value back if it has not overran
+    pwm->no_signal_cycles = no_signal_cycles;
+  }
+  sei();
+      
+  return lost_signal;
+}
+
+
+/** 
+ * Called from pin-change interrupt for rising or falling edge of servo pwm
+ */
+void updateServoPwm(struct ServoPwm* pwm, uint16_t time, char rising)
+{
+  if (rising)
+  {
+    // rising edge
+    pwm->valid_rising_edge = 1;
+    pwm->rising_edge_time = time;    
+  }
+  else if (pwm->valid_rising_edge)
+  {
+    pwm->valid_rising_edge = 0;
+    // falling edge with valid rising edge, determine pulse width
+    uint16_t width = time - pwm->rising_edge_time;
+    if ((width >= MIN_SERVO_PULSE_WIDTH) && (width <= MAX_SERVO_PULSE_WIDTH))
+    {
+      // pulse width seems valid
+      pwm->pulse_width = width;
+      pwm->no_signal_cycles = 0;
+    }
+    else
+    {
+      // debug toggle LED when bad pulse width is seen
+      LED1_PORT ^= (1<<LED1_PIN);
+    }
+  }
+}
+
+
+
+/**
+ * Use pin change interrupt and TIM0 to measure input PWM pulse width
+ * this uses a combination of TCNT0 and TIM0 overflow interrupt to
+ * generate a 16bit timestamp value that alows a servo pulse between
+ * 1 and 2ms to be measured.
+ * 
+ * PA1 : PWM1 : PCINT1
+ * PA2 : PWM2 : PCINT2
+ */
+uint8_t pcint_last_in;
+ISR(PCINT0_vect)
+{
+  // Read hardware registers immediately and in exact order specified
+  uint8_t in = PINA; // read pin A
+  MEMBAR();
+  uint16_t time = getTimestamp();
 
   // The pin change interrupt could be triggered by
   // and change of one or both PWM pins, use difference between
@@ -383,16 +446,14 @@ ISR(PCINT0_vect)
   if (changed & (1<<PWM1_PIN))
   {
     char rising_edge = (in & (1<<PWM1_PIN));
-    updateServoPwm(&pwm1, cnt.val, rising_edge);
+    updateServoPwm(&pwm1, time, rising_edge);
   }
 
-  /*
   if (changed & (1<<PWM2_PIN))
   {
     char rising_edge = (in & (1<<PWM2_PIN));
-    updateServoPwm(&pwm2, cnt.val, rising_edge);
+    updateServoPwm(&pwm2, time, rising_edge);
   }
-  */
 }
 
 
@@ -409,7 +470,7 @@ int main(void)
   TCCR0B = ((T0_WGMv>>2)<<WGM02) | T0_CSv;
 
   // Enable PWM mode on timer 1.  Have timer saturate at 0xFF
-  enum { T1_WGMv = 5 }; //fast PWM mode use 0xFF as TOP
+  enum { T1_WGMv = 3 }; //fast PWM mode use 0xFF as TOP
   enum { T1_CSv = 4 };  //use internal clock with no prescalling
   TCCR1A = (T1_WGMv&3);
   TCCR1B = ((T1_WGMv>>2)<<WGM12) | T1_CSv;
@@ -424,31 +485,44 @@ int main(void)
   TIMSK0 = (1<<TOIE0);  
 
   // Enabled PCINT1 and PCINT2 for PA1 and PA2 pin change interrupts
-  PCMSK0 = (1<<PCINT1); // debug | (1<<PCINT2);
+  PCMSK0 = (1<<PCINT1) | (1<<PCINT2);
   GIMSK = (1<<PCIE0);
   pcint_last_in = PINA;
 
   // Enable interrupts
   sei();
 
-  int16_t duty = 0;
-  int8_t direction = 2;
+  uint8_t ovf_counter = 0;
   while (1)
   {
-    //setMotor1(duty);
-    setMotor2(duty);
-    duty+=direction;
-    if ((direction > 0) && (duty > 300))
+    if (tim0_ovf_flag)
     {
-      duty = 0;
-      //direction = -1;
-    }
-    else if ((direction < 0) && (duty <= -300))
-    {
-      duty = 0;
-      //direction = 1;
-    }
-    _delay_ms(20);
+      tim0_ovf_flag = 0;
+      ++ovf_counter;      
+      if (ovf_counter > 62)
+      {
+        ovf_counter = 0;
+        //LED1_PORT ^= (1<<LED1_PIN);
+        // when overflow counter reaches 62 it means about 
+        // 62*256/8Mhz = 1.984ms have elapsed
+        uint16_t time = getTimestamp();
+        if (timeoutServoPwm(&pwm1, time) || timeoutServoPwm(&pwm2, time))
+        {
+          // servo signals stopped comming in, disable motors
+          LED2_PORT &= ~(1<<LED2_PIN);
+          disableMotors();
+        }
+        else 
+        {
+          LED2_PORT |= (1<<LED2_PIN);
+
+          // calculate new duty values from servo values
+          setMotor1(0);
+          setMotor2(0);
+        }
+      } // end if (ovf_counter > 62)
+    } // end if (tim0_ovf_flag)
+
   }
 
   return 0;
