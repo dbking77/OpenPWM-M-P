@@ -68,7 +68,7 @@
  * Notes
  *   avr-gcc -print-file-name=include 
  *   g/usr/lib/gcc/avr/4.5.3/include
- *   /usr/lib/avr/include/avr/iotn25.h
+ *   /usr/lib/avr/include/avr/iotn24a.h
  */
 
 
@@ -219,13 +219,13 @@ void setMotor2(int16_t duty)
 
   if (duty < 0)
   {
-    OCR1A = duty-1;
+    OCR1A = 0xFF&(duty-1);
     OCR1B = 0xFF; // 0xFF high always
   }
   else 
   {    
     OCR1A = 0xFF; // 0xFF high always
-    OCR1B = -duty-1;
+    OCR1B = 0xFF&(-duty-1);
   }
 }
 
@@ -238,6 +238,163 @@ void disableMotors()
   TCCR0A &= 0x0F;  // Clears COM0A and COM0B (top 4 bits)
   TCCR1A &= 0x0F;
 }
+
+
+
+volatile uint8_t tim0_ovf_count = 0;
+ISR(TIM0_OVF_vect)
+{
+  //LED2_PORT |= (1<<LED2_PIN);
+  ++tim0_ovf_count;
+  //LED2_PORT &=~ (1<<LED2_PIN);
+}
+
+
+struct ServoPwm
+{
+  // pulse width measurement value of 8000 = 1ms.
+  // value of zero is special and indicates valid value
+  uint16_t pulse_width;
+  uint16_t rising_edge_cnt;
+  char valid_rising_edge; // true if rising edge was captured recently
+
+  // Assume minimum value pulse width is 0.5ms and max is 2.5ms
+  // 8MHz * 0.5ms = 4000
+  // 8Mhz * 2.5ms = 20000
+} pwm1, pwm2;
+
+//enum {MIN_SERVO_PULSE_WIDTH=4000, MAX_SERVO_PULSE_WIDTH=20000};
+enum {MIN_SERVO_PULSE_WIDTH=8000, MAX_SERVO_PULSE_WIDTH=16000};
+
+
+void updateServoPwm(struct ServoPwm* pwm, uint16_t cnt, char rising)
+{
+  if (rising)
+  {
+    // rising edge
+    pwm->valid_rising_edge = 1;
+    pwm->rising_edge_cnt = cnt;    
+  }
+  else if (pwm->valid_rising_edge)
+  {
+    LED2_PORT ^= (1<<LED2_PIN);
+    pwm->valid_rising_edge = 0;
+    // falling edge with valid rising edge, determine pulse width
+    uint16_t width = cnt - pwm->rising_edge_cnt;
+    if ((width >= MIN_SERVO_PULSE_WIDTH) && (width <= MAX_SERVO_PULSE_WIDTH))
+    {
+      // pulse width seems valid
+      pwm->pulse_width = width;
+    }
+    else
+    {
+      LED1_PORT ^= (1<<LED1_PIN);
+    }
+  }
+}
+
+// Prevent compiler from moving memory access operations across this code
+#define MEMBAR() __asm volatile( "" ::: "memory" );
+
+/** This struct allows use to create 16bit value from two 8bit values.
+ *  It assumes that avrgcc organizes memory in little-endian order
+ *
+ * AVR uses 8bit registers, so 16bit value is stored two 8bit register
+ * The typical code to concatinate two 8bit values into 16bit values is:
+ *  
+ *  uint8_t lo,hi;
+ *  uint16_t result = (hi<<8) | lo;
+ * 
+ * The above code really shouldn't produce any assembly, because its just
+ * shuffling around registers but it does:
+ *    166:	83 2f       	mov	r24, r19
+ *    168:	90 e0       	ldi	r25, 0x00	; 0
+ *    16a:	92 2b       	or	r25, r18
+ *    16c:	90 93 6d 00 	sts	0x006D, r25
+ *    170:	80 93 6c 00 	sts	0x006C, r24
+ *
+ * If the union is used instead, the assembly looks like
+ *    176:	c3 2f       	mov	r28, r19
+ *    178:	d2 2f       	mov	r29, r18
+ *    17a:	d0 93 6d 00 	sts	0x006D, r29
+ *    17e:	c0 93 6c 00 	sts	0x006C, r2
+ */
+union Counter16
+{
+  uint16_t val;
+  struct 
+  {
+    uint8_t lo,hi;
+  };
+};
+
+
+/**
+ * Use pin change interrupt and TIM0 to measure input PWM pulse width
+ * this uses a combination of TCNT0 and TIM0 overflow interrupt to
+ * generate a 16bit timestamp value that alows a servo pulse between
+ * 1 and 2ms to be measured.
+ * 
+ * PA1 : PWM1 : PCINT1
+ * PA2 : PWM2 : PCINT2
+ */
+uint8_t pcint_last_in;
+ISR(PCINT0_vect)
+{
+  // Read hardware registers immediately and in exact order specified
+  uint8_t in = PINA; // read pin A
+  MEMBAR();
+  union Counter16 cnt;
+  cnt.lo = TCNT0;
+  MEMBAR();
+  cnt.hi = tim0_ovf_count;
+  MEMBAR();
+  uint8_t tifr = TIFR0;
+  MEMBAR();
+
+  // A servo PWM pulse is typically between 1.0 and 2.0 ms long.
+  // Since clock is 8Mhz, this a 2.0ms pulse is 16000 cycles.
+  // Unfortunately TIM0 is only 8bit (and TIM1 is set to only count to 8bit).
+  // Just using the TCNT0 value to measure pulse width is not enough.
+  // 
+  // To generate top 8bits of 16bit time value, the timer overflow interrupt to
+  // increment an 8bit overflow counter.  
+  // Typically concatinating the overflow counter 8bit TCNT0 value produces 
+  // will prodcue the correct overflow count.  
+  // However, the is a race condition where the TNCT timer has overflowed
+  // but the ISR has not run to increment the counter.
+  // In this case the timer overflow flag will be set and TCNT will have a low
+  // value.  In this case, the code should add 1 to the counter before using it.
+  // There is is also the possibility that the timer overflows just after TCNT
+  // is read, in this case the overflow flag will be set, and TCNT will be high,
+  // in this case the overflow counter is correct.
+  if ((tifr & (1<<TOV0)) && (cnt.lo & 0x80))
+  {
+    union Counter16 cnt;
+    ++cnt.hi;
+  }
+
+  // The pin change interrupt could be triggered by
+  // and change of one or both PWM pins, use difference between
+  // last and current pin values to determine which pins changed
+  uint8_t changed = in ^ pcint_last_in;
+  pcint_last_in = in;  
+
+  if (changed & (1<<PWM1_PIN))
+  {
+    char rising_edge = (in & (1<<PWM1_PIN));
+    updateServoPwm(&pwm1, cnt.val, rising_edge);
+  }
+
+  /*
+  if (changed & (1<<PWM2_PIN))
+  {
+    char rising_edge = (in & (1<<PWM2_PIN));
+    updateServoPwm(&pwm2, cnt.val, rising_edge);
+  }
+  */
+}
+
 
 
 int main(void)
@@ -253,7 +410,7 @@ int main(void)
 
   // Enable PWM mode on timer 1.  Have timer saturate at 0xFF
   enum { T1_WGMv = 5 }; //fast PWM mode use 0xFF as TOP
-  enum { T1_CSv = 1 };  //use internal clock with no prescalling
+  enum { T1_CSv = 4 };  //use internal clock with no prescalling
   TCCR1A = (T1_WGMv&3);
   TCCR1B = ((T1_WGMv>>2)<<WGM12) | T1_CSv;
 
@@ -261,14 +418,24 @@ int main(void)
   TCNT0 = 0;
   TCNT1 = 0x84;
 
+  // Timer interrupt mask for timer0
+  // Use timer0 overflow interrupt along with timer 0 value to
+  // measure servo pwm pulse
+  TIMSK0 = (1<<TOIE0);  
+
+  // Enabled PCINT1 and PCINT2 for PA1 and PA2 pin change interrupts
+  PCMSK0 = (1<<PCINT1); // debug | (1<<PCINT2);
+  GIMSK = (1<<PCIE0);
+  pcint_last_in = PINA;
+
   // Enable interrupts
-  //sei();
+  sei();
 
   int16_t duty = 0;
-  int8_t direction = -1;
+  int8_t direction = 2;
   while (1)
   {
-    setMotor1(duty);
+    //setMotor1(duty);
     setMotor2(duty);
     duty+=direction;
     if ((direction > 0) && (duty > 300))

@@ -106,13 +106,13 @@ void setMotorOutput(int16_t duty)
 
   if (duty < 0)
   {
-    OCR0A = duty;
+    OCR0A = duty-1;
     OCR0B = 0xFF; // 0xFF high always
   }
   else 
   {    
     OCR0A = 0xFF; // 0xFF high always
-    OCR0B = 0xFF-duty;
+    OCR0B = -duty-1;
   }
 }
 
