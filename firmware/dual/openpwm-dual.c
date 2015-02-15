@@ -138,6 +138,17 @@ void gpioInit()
   PORTB = 0;
 }
 
+/*
+ * Mapping of Timers to Outputs
+ *  output1 and output2 are a pair
+ *  output2 and output4 are a pair
+ *  
+ *  output1 : PB2 : OC0A
+ *  output2 : PA7 : OC0B
+ *  output3 : PA5 : OC1B
+ *  output4 : PA6 : OC1A
+ */
+
 
 /**
  * Set duty for motor1 (out1 and out2)
@@ -154,10 +165,10 @@ void setMotor1(int16_t duty)
   // set A & B outputs to non-inverting (for fast PWM)
   // in non-inverting mode pins are SET at BOTTOM
   enum { T0_COMv = 2 }; 
-
   TCCR0A |= (T0_COMv<<COM0A0) | (T0_COMv<<COM0B0);
 
-  if (duty>0xFF)
+  // Staturate duty between -0xFF and 0xFF
+  if (duty > 0xFF)
   {
     duty = 0xFF;
   }
@@ -168,13 +179,13 @@ void setMotor1(int16_t duty)
 
   if (duty < 0)
   {
-    OCR0A = duty;
+    OCR0A = duty-1;
     OCR0B = 0xFF; // 0xFF high always
   }
   else 
   {    
     OCR0A = 0xFF; // 0xFF high always
-    OCR0B = 0xFF-duty;
+    OCR0B = -duty-1;
   }
 }
 
@@ -184,19 +195,20 @@ void setMotor1(int16_t duty)
  *    value of -255 = full reverse
  *    value of 0 = stop/brake
  * 
- * out1 = PB2 = OC0A
- * out2 = PA7 = OC0B
+ * out3 = PA5 = OC1B
+ * out4 = PA6 = OC1A
  */
 void setMotor2(int16_t duty)
 {
   // Enable outputs, by enable PWM control of pins
   // set A & B outputs to non-inverting (for fast PWM)
-  // in non-inverting mode pins are SET at BOTTOM
+  // in non-inverting mode pins are set at BOTTOM, and cleared on compare match
   enum { T1_COMv = 2 }; 
 
   TCCR1A |= (T1_COMv<<COM0A0) | (T1_COMv<<COM0B0);
 
-  if (duty>0xFF)
+  // Staturate duty between -0xFF and 0xFF
+  if (duty > 0xFF)
   {
     duty = 0xFF;
   }
@@ -207,27 +219,23 @@ void setMotor2(int16_t duty)
 
   if (duty < 0)
   {
-    OCR1A = duty;
+    OCR1A = duty-1;
     OCR1B = 0xFF; // 0xFF high always
   }
   else 
   {    
     OCR1A = 0xFF; // 0xFF high always
-    OCR1B = 0xFF-duty;
+    OCR1B = -duty-1;
   }
 }
 
 
-void disableMotor1()
+void disableMotors()
 {
   // Disable outputs be switching pins to normal operation.
   // Out1 and out2 will PORT are already set to 0, so output will
   // high-Z and motor will coast
   TCCR0A &= 0x0F;  // Clears COM0A and COM0B (top 4 bits)
-}
-
-void disableMotor2()
-{
   TCCR1A &= 0x0F;
 }
 
@@ -251,13 +259,13 @@ int main(void)
 
   // Have timers run 180degrees out-of-phase to reduce supply ripple
   TCNT0 = 0;
-  TCNT1 = 0x7F;
+  TCNT1 = 0x84;
 
   // Enable interrupts
   //sei();
 
   int16_t duty = 0;
-  int8_t direction = 1;
+  int8_t direction = -1;
   while (1)
   {
     setMotor1(duty);
@@ -265,13 +273,15 @@ int main(void)
     duty+=direction;
     if ((direction > 0) && (duty > 300))
     {
-      direction = -1;
+      duty = 0;
+      //direction = -1;
     }
-    else if ((direction < 0) && (duty <= 0))
+    else if ((direction < 0) && (duty <= -300))
     {
-      direction = 1;
+      duty = 0;
+      //direction = 1;
     }
-    _delay_ms(10);
+    _delay_ms(20);
   }
 
   return 0;
