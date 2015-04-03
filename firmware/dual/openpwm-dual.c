@@ -45,7 +45,7 @@
  * unused [7:1]   
  * SELFPRGEN 0    : 1   : Self-prgromming enabled   : no
  *
- * High Fuse Byte : 11011111b = 0xDF
+ * High Fuse Byte : 11011111b = 0xDD
  * RSTDISBLE 7    : 1   : External reset disabled   : no
  * DWEN      6    : 1   : DebugWIRE active          : no
  * SPIEN     5    : 0   : Serial Program Enabled    : yes
@@ -345,7 +345,7 @@ enum
   MIN_VALID_SERVO_PULSE_WIDTH = 800*8, 
   CENTER_SERVO_PULSE_WIDTH    = 1500*8,
   MAX_VALID_SERVO_PULSE_WIDTH = 2200*8,
-  SERVO_DEADZONE_WIDTH        = 75*8,
+  SERVO_DEADZONE_WIDTH        = 100*8,
 };
 
 // Number of 2ms cycles before servo signal is assumed to be *lost*
@@ -529,6 +529,7 @@ int main(void)
   // Enable interrupts
   sei();
 
+  uint8_t stable_counter = 0;
   uint8_t ovf_counter = 0;
   while (1)
   {
@@ -548,9 +549,11 @@ int main(void)
           // servo signals stopped comming in, disable motors
           LED2_PORT &= ~(1<<LED2_PIN);
           disableMotors();
+          stable_counter = 0;
         }
         else 
         {
+          
           LED2_PORT |= (1<<LED2_PIN);
 
           // calculate new duty values from servo values
@@ -572,8 +575,15 @@ int main(void)
           int16_t duty1 = -forward - rotate;
           int16_t duty2 = -forward + rotate;
 
-          setMotor1(-duty1>>2);
-          setMotor2(duty2>>2);
+          if (stable_counter < 100)
+          {
+            ++stable_counter;
+          }
+          else
+          {
+            setMotor1(-duty1>>2);
+            setMotor2(duty2>>2);
+          }
         }
       } // end if (ovf_counter > 62)
     } // end if (tim0_ovf_flag)
