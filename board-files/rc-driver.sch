@@ -7319,8 +7319,8 @@ Source: www.kingbright.com</description>
 <part name="JP2" library="pinhead" deviceset="PINHD-1X2" device=""/>
 <part name="U$1" library="mgregg" deviceset="A4950-HBRIDGE" device=""/>
 <part name="R2" library="resistor" deviceset="R-US_" device="R0805W"/>
-<part name="R3" library="resistor" deviceset="R-US_" device="R0603"/>
-<part name="R5" library="resistor" deviceset="R-US_" device="R0603"/>
+<part name="R3" library="resistor" deviceset="R-US_" device="R0603" value="5600"/>
+<part name="R5" library="resistor" deviceset="R-US_" device="R0603" value="1300"/>
 <part name="R6" library="resistor" deviceset="R-US_" device="R0603"/>
 </parts>
 <sheets>

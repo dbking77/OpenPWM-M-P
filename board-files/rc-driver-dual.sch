@@ -7621,8 +7621,8 @@ Source: www.kingbright.com</description>
 <part name="C3" library="resistor" deviceset="C-US" device="C0603" value="0.1uf"/>
 <part name="R1" library="resistor" deviceset="R-US_" device="R0805W"/>
 <part name="R2" library="resistor" deviceset="R-US_" device="R0805W"/>
-<part name="R3" library="resistor" deviceset="R-US_" device="R0603"/>
-<part name="R4" library="resistor" deviceset="R-US_" device="R0603"/>
+<part name="R3" library="resistor" deviceset="R-US_" device="R0603" value="5600"/>
+<part name="R4" library="resistor" deviceset="R-US_" device="R0603" value="1300"/>
 <part name="R5" library="resistor" deviceset="R-US_" device="R0603"/>
 <part name="LED1" library="led" deviceset="LED" device="CHIPLED_0603"/>
 <part name="RT1" library="resistor" deviceset="R-US_" device="R0603"/>

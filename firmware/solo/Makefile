@@ -19,8 +19,8 @@
 ##
 
 PROGRAM = openpwm-m-p
-MCU = attiny85
-AVRDUDE_MCU = -p t85
+MCU = attiny25
+AVRDUDE_MCU = -p t25
 CC = avr-gcc
 OBJCOPY = avr-objcopy
 OBJDUMP = avr-objdump
