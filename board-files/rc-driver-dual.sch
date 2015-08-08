@@ -7619,16 +7619,16 @@ Source: www.kingbright.com</description>
 <part name="C1" library="resistor" deviceset="C-US" device="C1206" value="10uf"/>
 <part name="C2" library="resistor" deviceset="C-US" device="C0603" value="0.1uf"/>
 <part name="C3" library="resistor" deviceset="C-US" device="C0603" value="0.1uf"/>
-<part name="R1" library="resistor" deviceset="R-US_" device="R0805W"/>
-<part name="R2" library="resistor" deviceset="R-US_" device="R0805W"/>
+<part name="R1" library="resistor" deviceset="R-US_" device="R0805W" value="0.047"/>
+<part name="R2" library="resistor" deviceset="R-US_" device="R0805W" value="0.047"/>
 <part name="R3" library="resistor" deviceset="R-US_" device="R0603" value="5600"/>
 <part name="R4" library="resistor" deviceset="R-US_" device="R0603" value="1300"/>
-<part name="R5" library="resistor" deviceset="R-US_" device="R0603"/>
-<part name="LED1" library="led" deviceset="LED" device="CHIPLED_0603"/>
+<part name="R5" library="resistor" deviceset="R-US_" device="R0603" value="360"/>
+<part name="LED1" library="led" deviceset="LED" device="CHIPLED_0603" value="GREEN"/>
 <part name="RT1" library="resistor" deviceset="R-US_" device="R0603"/>
 <part name="R7" library="resistor" deviceset="R-US_" device="R0603"/>
-<part name="R6" library="resistor" deviceset="R-US_" device="R0603"/>
-<part name="LED2" library="led" deviceset="LED" device="CHIPLED_0603"/>
+<part name="R6" library="resistor" deviceset="R-US_" device="R0603" value="360"/>
+<part name="LED2" library="led" deviceset="LED" device="CHIPLED_0603" value="RED"/>
 <part name="C4" library="resistor" deviceset="C-US" device="C1206" value="10uf"/>
 <part name="C5" library="resistor" deviceset="C-US" device="C0603" value="0.1uf"/>
 </parts>
@@ -7653,7 +7653,7 @@ Source: www.kingbright.com</description>
 <instance part="C2" gate="G$1" x="0" y="116.84"/>
 <instance part="C3" gate="G$1" x="43.18" y="116.84"/>
 <instance part="R1" gate="G$1" x="73.66" y="68.58"/>
-<instance part="R2" gate="G$1" x="73.66" y="63.5"/>
+<instance part="R2" gate="G$1" x="73.66" y="60.96"/>
 <instance part="R3" gate="G$1" x="73.66" y="101.6"/>
 <instance part="R4" gate="G$1" x="91.44" y="101.6"/>
 <instance part="R5" gate="G$1" x="96.52" y="25.4"/>
@@ -7781,10 +7781,10 @@ Source: www.kingbright.com</description>
 <segment>
 <pinref part="R1" gate="G$1" pin="2"/>
 <pinref part="R2" gate="G$1" pin="2"/>
-<wire x1="78.74" y1="68.58" x2="78.74" y2="63.5" width="0.1524" layer="91"/>
-<wire x1="78.74" y1="63.5" x2="86.36" y2="63.5" width="0.1524" layer="91"/>
-<junction x="78.74" y="63.5"/>
-<label x="81.28" y="63.5" size="1.778" layer="95"/>
+<wire x1="78.74" y1="68.58" x2="78.74" y2="60.96" width="0.1524" layer="91"/>
+<wire x1="78.74" y1="60.96" x2="86.36" y2="60.96" width="0.1524" layer="91"/>
+<junction x="78.74" y="60.96"/>
+<label x="81.28" y="60.96" size="1.778" layer="95"/>
 </segment>
 <segment>
 <pinref part="R4" gate="G$1" pin="2"/>
@@ -7938,8 +7938,8 @@ Source: www.kingbright.com</description>
 <net name="N$2" class="0">
 <segment>
 <pinref part="R2" gate="G$1" pin="1"/>
-<wire x1="68.58" y1="63.5" x2="48.26" y2="63.5" width="0.1524" layer="91"/>
-<wire x1="48.26" y1="63.5" x2="48.26" y2="66.04" width="0.1524" layer="91"/>
+<wire x1="68.58" y1="60.96" x2="48.26" y2="60.96" width="0.1524" layer="91"/>
+<wire x1="48.26" y1="60.96" x2="48.26" y2="66.04" width="0.1524" layer="91"/>
 <pinref part="U$2" gate="G$1" pin="LSS12"/>
 <wire x1="48.26" y1="66.04" x2="43.18" y2="66.04" width="0.1524" layer="91"/>
 </segment>

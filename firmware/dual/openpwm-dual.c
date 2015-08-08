@@ -89,10 +89,6 @@
 #define OUT4_DDR DDRA
 #define OUT4_PIN 6
 
-#define LED1_PORT PORTA
-#define LED1_DDR DDRA
-#define LED1_PIN 4
-
 #define TOUT_PORT PORTA
 #define TOUT_DDR DDRA
 #define TOUT_PIN 0
@@ -105,10 +101,12 @@
 #define PWM2_DDR DDRA
 #define PWM2_PIN 2
 
+// Used to indicate error has occurred
 #define LED2_PORT PORTA
 #define LED2_DDR DDRA
 #define LED2_PIN 3
 
+// Used to indicate that input signal is being recv'ed
 #define LED1_PORT PORTA
 #define LED1_DDR DDRA
 #define LED1_PIN 4
@@ -419,7 +417,7 @@ void updateServoPwm(struct ServoPwm* pwm, uint16_t time, char rising)
     else
     {
       // debug toggle LED when bad pulse width is seen
-      LED1_PORT ^= (1<<LED1_PIN);
+      // LED1_PORT ^= (1<<LED1_PIN);
     }
   }
 }
@@ -547,14 +545,15 @@ int main(void)
         if (timeoutServoPwm(&pwm1, time) || timeoutServoPwm(&pwm2, time))
         {
           // servo signals stopped comming in, disable motors
-          LED2_PORT &= ~(1<<LED2_PIN);
+          LED1_PORT &= ~(1<<LED1_PIN);
+          LED2_PORT |= (1<<LED2_PIN);
           disableMotors();
           stable_counter = 0;
         }
         else 
         {
-          
-          LED2_PORT |= (1<<LED2_PIN);
+          LED1_PORT |= (1<<LED1_PIN);
+          LED2_PORT &= ~(1<<LED2_PIN);
 
           // calculate new duty values from servo values
           // assume:
@@ -572,8 +571,8 @@ int main(void)
           // scale rotate so that that max value 400 is now 1024
           rotate = (rotate * 5)>>4;
 
-          int16_t duty1 = -forward - rotate;
-          int16_t duty2 = -forward + rotate;
+          int16_t duty1 = forward + rotate;
+          int16_t duty2 = forward - rotate;
 
           if (stable_counter < 100)
           {
