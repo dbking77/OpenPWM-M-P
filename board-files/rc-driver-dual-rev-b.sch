@@ -120,6 +120,21 @@
 <wire x1="2.7" y1="2.85" x2="2.7" y2="-3.15" width="0.127" layer="21"/>
 <circle x="-3.32" y="-3.05" radius="0.3" width="0.127" layer="21"/>
 </package>
+<package name="MPU6050-NO-INT">
+<description>Breakout footprint for DF-Robot MPU6050 without interrupt pin</description>
+<pad name="1" x="-5.08" y="0" drill="1.016" shape="square"/>
+<pad name="2" x="-2.54" y="0" drill="1.016"/>
+<pad name="3" x="0" y="0" drill="1.016"/>
+<pad name="4" x="2.54" y="0" drill="1.016"/>
+<wire x1="10.5" y1="-1.5" x2="-10.5" y2="-1.5" width="0.127" layer="51"/>
+<wire x1="-10.5" y1="-1.5" x2="-10.5" y2="12.5" width="0.127" layer="51"/>
+<wire x1="-10.5" y1="12.5" x2="10.5" y2="12.5" width="0.127" layer="51"/>
+<wire x1="10.5" y1="12.5" x2="10.5" y2="-1.5" width="0.127" layer="51"/>
+<wire x1="-6.35" y1="1.27" x2="3.81" y2="1.27" width="0.127" layer="21"/>
+<wire x1="3.81" y1="1.27" x2="3.81" y2="-1.27" width="0.127" layer="21"/>
+<wire x1="3.81" y1="-1.27" x2="-6.35" y2="-1.27" width="0.127" layer="21"/>
+<wire x1="-6.35" y1="-1.27" x2="-6.35" y2="1.27" width="0.127" layer="21"/>
+</package>
 </packages>
 <symbols>
 <symbol name="ATTINY24A/44A/84A">
@@ -163,6 +178,19 @@
 <wire x1="17.78" y1="-10.16" x2="17.78" y2="10.16" width="0.254" layer="94"/>
 <wire x1="17.78" y1="10.16" x2="-7.62" y2="10.16" width="0.254" layer="94"/>
 <text x="2.54" y="7.62" size="1.778" layer="94">A4954</text>
+</symbol>
+<symbol name="MPU6050-NO-INT">
+<description>DFROBOT MPU6050 Breakout without interrupt pin</description>
+<pin name="VIN" x="12.7" y="2.54" length="middle" direction="in" rot="R180"/>
+<pin name="SDA" x="-12.7" y="2.54" length="middle"/>
+<pin name="SCL" x="-12.7" y="0" length="middle"/>
+<pin name="GND" x="12.7" y="0" length="middle" direction="pwr" rot="R180"/>
+<wire x1="-7.62" y1="5.08" x2="-7.62" y2="-2.54" width="0.254" layer="94"/>
+<wire x1="-7.62" y1="-2.54" x2="7.62" y2="-2.54" width="0.254" layer="94"/>
+<wire x1="7.62" y1="-2.54" x2="7.62" y2="5.08" width="0.254" layer="94"/>
+<wire x1="7.62" y1="5.08" x2="-7.62" y2="5.08" width="0.254" layer="94"/>
+<text x="-7.62" y="6.35" size="1.778" layer="95">&gt;NAME</text>
+<text x="7.62" y="-3.81" size="1.778" layer="96" rot="R180">&gt;VALUE</text>
 </symbol>
 </symbols>
 <devicesets>
@@ -224,6 +252,27 @@
 <attribute name="MF" value="Allegro"/>
 <attribute name="MPN" value="A4954"/>
 </technology>
+</technologies>
+</device>
+</devices>
+</deviceset>
+<deviceset name="MPU6050-NO-INT" prefix="U">
+<description>DF-Robot MPU6050 breakout.  Without interrupt pin.
+&lt;br&gt;
+http://www.dfrobot.com/wiki/index.php/6_DOF_Sensor-MPU6050_(SKU:SEN0142)</description>
+<gates>
+<gate name="G$1" symbol="MPU6050-NO-INT" x="0" y="0"/>
+</gates>
+<devices>
+<device name="" package="MPU6050-NO-INT">
+<connects>
+<connect gate="G$1" pin="GND" pad="2"/>
+<connect gate="G$1" pin="SCL" pad="4"/>
+<connect gate="G$1" pin="SDA" pad="3"/>
+<connect gate="G$1" pin="VIN" pad="1"/>
+</connects>
+<technologies>
+<technology name=""/>
 </technologies>
 </device>
 </devices>
@@ -7808,17 +7857,17 @@ http://www.micrel.com&lt;p&gt;
 <part name="U$2" library="rc-parts" deviceset="A4954-DUAL-HBRIDGE" device=""/>
 <part name="SV1" library="con-lstb" deviceset="MA06-1" device=""/>
 <part name="C1" library="resistor" deviceset="C-US" device="C1206" value="10uF"/>
-<part name="C2" library="resistor" deviceset="C-US" device="C0603" value="1uF"/>
+<part name="C2" library="resistor" deviceset="C-US" device="C0603" value="2.2uF"/>
 <part name="C3" library="resistor" deviceset="C-US" device="C0603" value="1uF"/>
 <part name="R1" library="resistor" deviceset="R-US_" device="R0805" value="0.047"/>
 <part name="R2" library="resistor" deviceset="R-US_" device="R0805" value="0.047"/>
-<part name="R3" library="resistor" deviceset="R-US_" device="R0603" value="5.6k"/>
-<part name="R4" library="resistor" deviceset="R-US_" device="R0603" value="1.3k"/>
-<part name="R5" library="resistor" deviceset="R-US_" device="R0603" value="360"/>
+<part name="R3" library="resistor" deviceset="R-US_" device="R0402" value="5.6k"/>
+<part name="R4" library="resistor" deviceset="R-US_" device="R0402" value="1.3k"/>
+<part name="R5" library="resistor" deviceset="R-US_" device="R0402" value="360"/>
 <part name="D1" library="led" deviceset="LED" device="CHIPLED_0603" value="GREEN"/>
-<part name="RT1" library="resistor" deviceset="R-US_" device="R0603" value="10k"/>
-<part name="R7" library="resistor" deviceset="R-US_" device="R0603" value="5.6k"/>
-<part name="R6" library="resistor" deviceset="R-US_" device="R0603" value="360"/>
+<part name="RT1" library="resistor" deviceset="R-US_" device="R0402" value="10k"/>
+<part name="R7" library="resistor" deviceset="R-US_" device="R0402" value="5.6k"/>
+<part name="R6" library="resistor" deviceset="R-US_" device="R0402" value="360"/>
 <part name="D2" library="led" deviceset="LED" device="CHIPLED_0603" value="RED"/>
 <part name="C4" library="resistor" deviceset="C-US" device="C1206" value="10uF"/>
 <part name="C5" library="resistor" deviceset="C-US" device="C0603" value="1uF"/>
@@ -7844,20 +7893,21 @@ http://www.micrel.com&lt;p&gt;
 <attribute name="MPN" value="TPS70950"/>
 </part>
 <part name="GND4" library="supply1" deviceset="GND" device=""/>
-<part name="C6" library="resistor" deviceset="C-US" device="C1206" value="10uF"/>
+<part name="C6" library="resistor" deviceset="C-US" device="C0603" value="2.2uF"/>
 <part name="GND5" library="supply1" deviceset="GND" device=""/>
 <part name="SUPPLY3" library="supply2" deviceset="+5V" device=""/>
-<part name="C7" library="resistor" deviceset="C-US" device="C0603" value="1uF"/>
-<part name="SUPPLY4" library="supply2" deviceset="+12V" device=""/>
+<part name="U1" library="rc-parts" deviceset="MPU6050-NO-INT" device=""/>
+<part name="SUPPLY6" library="supply2" deviceset="+5V" device=""/>
+<part name="GND14" library="supply1" deviceset="GND" device=""/>
 <part name="GND11" library="supply1" deviceset="GND" device=""/>
 </parts>
 <sheets>
 <sheet>
 <plain>
-<text x="43.18" y="-5.08" size="5.08" layer="91">OpenPWM-Dual-revB</text>
-<text x="43.18" y="-12.7" size="5.08" layer="91">https://github.com/cinchcircuits/OpenPWM-M-P</text>
-<text x="43.18" y="-20.32" size="5.08" layer="91">Released under the TAPR License:</text>
-<text x="43.18" y="-27.94" size="5.08" layer="91">http://www.tapr.org/ohl.html</text>
+<text x="50.8" y="-12.7" size="5.08" layer="91">OpenPWM-Dual-revB</text>
+<text x="50.8" y="-20.32" size="5.08" layer="91">https://github.com/cinchcircuits/OpenPWM-M-P</text>
+<text x="50.8" y="-27.94" size="5.08" layer="91">Released under the TAPR License:</text>
+<text x="50.8" y="-35.56" size="5.08" layer="91">http://www.tapr.org/ohl.html</text>
 <text x="-53.34" y="-5.08" size="5.08" layer="91">Rev B</text>
 <text x="-53.34" y="-12.7" size="5.08" layer="91">Michael Gregg</text>
 <text x="-53.34" y="-20.32" size="5.08" layer="91">Derek King</text>
@@ -7880,7 +7930,7 @@ http://www.micrel.com&lt;p&gt;
 <instance part="R6" gate="G$1" x="93.98" y="35.56"/>
 <instance part="D2" gate="G$1" x="104.14" y="35.56" rot="R90"/>
 <instance part="C4" gate="G$1" x="12.7" y="96.52"/>
-<instance part="C5" gate="G$1" x="53.34" y="96.52"/>
+<instance part="C5" gate="G$1" x="63.5" y="96.52"/>
 <instance part="GND1" gate="1" x="48.26" y="50.8"/>
 <instance part="GND2" gate="1" x="111.76" y="17.78"/>
 <instance part="GND3" gate="1" x="111.76" y="33.02"/>
@@ -7893,19 +7943,20 @@ http://www.micrel.com&lt;p&gt;
 <instance part="SUPPLY2" gate="+5V" x="-17.78" y="43.18"/>
 <instance part="SUPPLY5" gate="+5V" x="60.96" y="35.56"/>
 <instance part="SUPPLY7" gate="+12V" x="76.2" y="66.04"/>
-<instance part="SUPPLY8" gate="+12V" x="60.96" y="104.14"/>
-<instance part="GND12" gate="1" x="53.34" y="88.9"/>
+<instance part="SUPPLY8" gate="+12V" x="55.88" y="104.14"/>
+<instance part="GND12" gate="1" x="43.18" y="88.9"/>
 <instance part="SV4" gate="1" x="-60.96" y="60.96"/>
 <instance part="GND13" gate="1" x="-33.02" y="53.34" rot="MR0"/>
 <instance part="SUPPLY9" gate="+5V" x="-33.02" y="60.96" rot="MR0"/>
-<instance part="IC1" gate="G1" x="93.98" y="93.98"/>
-<instance part="GND4" gate="1" x="96.52" y="81.28"/>
-<instance part="C6" gate="G$1" x="106.68" y="96.52"/>
-<instance part="GND5" gate="1" x="106.68" y="88.9"/>
-<instance part="SUPPLY3" gate="+5V" x="106.68" y="101.6"/>
-<instance part="C7" gate="G$1" x="78.74" y="96.52" rot="MR0"/>
-<instance part="SUPPLY4" gate="+12V" x="78.74" y="101.6"/>
-<instance part="GND11" gate="1" x="78.74" y="88.9"/>
+<instance part="IC1" gate="G1" x="81.28" y="96.52"/>
+<instance part="GND4" gate="1" x="83.82" y="83.82"/>
+<instance part="C6" gate="G$1" x="93.98" y="99.06"/>
+<instance part="GND5" gate="1" x="93.98" y="91.44"/>
+<instance part="SUPPLY3" gate="+5V" x="93.98" y="104.14"/>
+<instance part="U1" gate="G$1" x="25.4" y="-5.08"/>
+<instance part="SUPPLY6" gate="+5V" x="40.64" y="0"/>
+<instance part="GND14" gate="1" x="40.64" y="-7.62"/>
+<instance part="GND11" gate="1" x="63.5" y="88.9"/>
 </instances>
 <busses>
 </busses>
@@ -7960,35 +8011,30 @@ http://www.micrel.com&lt;p&gt;
 </net>
 <net name="+12V" class="0">
 <segment>
-<pinref part="IC1" gate="G1" pin="IN"/>
-<wire x1="83.82" y1="99.06" x2="78.74" y2="99.06" width="0.1524" layer="91"/>
-<pinref part="SUPPLY4" gate="+12V" pin="+12V"/>
-<pinref part="C7" gate="G$1" pin="1"/>
-<junction x="78.74" y="99.06"/>
-</segment>
-<segment>
 <pinref part="C3" gate="G$1" pin="1"/>
 <pinref part="C1" gate="G$1" pin="1"/>
 <label x="30.48" y="99.06" size="1.778" layer="95"/>
 <pinref part="C4" gate="G$1" pin="1"/>
 <pinref part="C5" gate="G$1" pin="1"/>
 <pinref part="U$2" gate="G$1" pin="VBB"/>
-<wire x1="43.18" y1="81.28" x2="60.96" y2="81.28" width="0.1524" layer="91"/>
-<wire x1="60.96" y1="81.28" x2="60.96" y2="101.6" width="0.1524" layer="91"/>
+<wire x1="43.18" y1="81.28" x2="55.88" y2="81.28" width="0.1524" layer="91"/>
+<wire x1="55.88" y1="81.28" x2="55.88" y2="101.6" width="0.1524" layer="91"/>
 <label x="48.26" y="81.28" size="1.778" layer="95"/>
 <pinref part="SUPPLY8" gate="+12V" pin="+12V"/>
 <wire x1="12.7" y1="99.06" x2="12.7" y2="101.6" width="0.1524" layer="91"/>
 <wire x1="12.7" y1="101.6" x2="22.86" y2="101.6" width="0.1524" layer="91"/>
-<junction x="60.96" y="101.6"/>
+<junction x="55.88" y="101.6"/>
 <wire x1="22.86" y1="101.6" x2="43.18" y2="101.6" width="0.1524" layer="91"/>
-<wire x1="43.18" y1="101.6" x2="53.34" y2="101.6" width="0.1524" layer="91"/>
-<wire x1="53.34" y1="101.6" x2="60.96" y2="101.6" width="0.1524" layer="91"/>
+<wire x1="43.18" y1="101.6" x2="55.88" y2="101.6" width="0.1524" layer="91"/>
 <wire x1="22.86" y1="99.06" x2="22.86" y2="101.6" width="0.1524" layer="91"/>
 <wire x1="43.18" y1="99.06" x2="43.18" y2="101.6" width="0.1524" layer="91"/>
-<wire x1="53.34" y1="99.06" x2="53.34" y2="101.6" width="0.1524" layer="91"/>
+<wire x1="63.5" y1="99.06" x2="63.5" y2="101.6" width="0.1524" layer="91"/>
 <junction x="22.86" y="101.6"/>
 <junction x="43.18" y="101.6"/>
-<junction x="53.34" y="101.6"/>
+<junction x="63.5" y="101.6"/>
+<pinref part="IC1" gate="G1" pin="IN"/>
+<wire x1="55.88" y1="101.6" x2="63.5" y2="101.6" width="0.1524" layer="91"/>
+<wire x1="63.5" y1="101.6" x2="71.12" y2="101.6" width="0.1524" layer="91"/>
 </segment>
 <segment>
 <label x="81.28" y="63.5" size="1.778" layer="95"/>
@@ -8011,17 +8057,18 @@ http://www.micrel.com&lt;p&gt;
 <pinref part="GND10" gate="1" pin="GND"/>
 </segment>
 <segment>
+<pinref part="C5" gate="G$1" pin="2"/>
+<pinref part="GND11" gate="1" pin="GND"/>
+</segment>
+<segment>
 <pinref part="C3" gate="G$1" pin="2"/>
 <wire x1="43.18" y1="91.44" x2="22.86" y2="91.44" width="0.1524" layer="91"/>
 <pinref part="C1" gate="G$1" pin="2"/>
 <wire x1="22.86" y1="91.44" x2="12.7" y2="91.44" width="0.1524" layer="91"/>
 <junction x="22.86" y="91.44"/>
 <pinref part="C4" gate="G$1" pin="2"/>
-<pinref part="C5" gate="G$1" pin="2"/>
-<wire x1="43.18" y1="91.44" x2="53.34" y2="91.44" width="0.1524" layer="91"/>
 <junction x="43.18" y="91.44"/>
 <pinref part="GND12" gate="1" pin="GND"/>
-<junction x="53.34" y="91.44"/>
 <pinref part="U$2" gate="G$1" pin="GND"/>
 <wire x1="7.62" y1="81.28" x2="-5.08" y2="81.28" width="0.1524" layer="91"/>
 <label x="-2.54" y="81.28" size="1.778" layer="95"/>
@@ -8075,8 +8122,9 @@ http://www.micrel.com&lt;p&gt;
 <pinref part="GND5" gate="1" pin="GND"/>
 </segment>
 <segment>
-<pinref part="C7" gate="G$1" pin="2"/>
-<pinref part="GND11" gate="1" pin="GND"/>
+<pinref part="U1" gate="G$1" pin="GND"/>
+<pinref part="GND14" gate="1" pin="GND"/>
+<wire x1="40.64" y1="-5.08" x2="38.1" y2="-5.08" width="0.1524" layer="91"/>
 </segment>
 </net>
 <net name="LED1" class="0">
@@ -8117,33 +8165,38 @@ http://www.micrel.com&lt;p&gt;
 <segment>
 <pinref part="IC1" gate="G1" pin="OUT"/>
 <pinref part="C6" gate="G$1" pin="1"/>
-<wire x1="104.14" y1="99.06" x2="106.68" y2="99.06" width="0.1524" layer="91"/>
+<wire x1="91.44" y1="101.6" x2="93.98" y2="101.6" width="0.1524" layer="91"/>
 <pinref part="SUPPLY3" gate="+5V" pin="+5V"/>
-<junction x="106.68" y="99.06"/>
+<junction x="93.98" y="101.6"/>
+</segment>
+<segment>
+<pinref part="U1" gate="G$1" pin="VIN"/>
+<pinref part="SUPPLY6" gate="+5V" pin="+5V"/>
+<wire x1="40.64" y1="-2.54" x2="38.1" y2="-2.54" width="0.1524" layer="91"/>
 </segment>
 </net>
 <net name="PWM1" class="0">
-<segment>
-<pinref part="U$1" gate="G$1" pin="PA1"/>
-<wire x1="12.7" y1="27.94" x2="0" y2="27.94" width="0.1524" layer="91"/>
-<label x="2.54" y="27.94" size="1.778" layer="95"/>
-</segment>
 <segment>
 <pinref part="SV4" gate="1" pin="3"/>
 <wire x1="-53.34" y1="60.96" x2="-38.1" y2="60.96" width="0.1524" layer="91"/>
 <label x="-38.1" y="60.96" size="1.778" layer="95" rot="MR0"/>
 </segment>
+<segment>
+<pinref part="U$1" gate="G$1" pin="PA1"/>
+<wire x1="12.7" y1="27.94" x2="0" y2="27.94" width="0.1524" layer="91"/>
+<label x="2.54" y="27.94" size="1.778" layer="95"/>
+</segment>
 </net>
 <net name="PWM2" class="0">
-<segment>
-<pinref part="U$1" gate="G$1" pin="PA2"/>
-<wire x1="12.7" y1="25.4" x2="0" y2="25.4" width="0.1524" layer="91"/>
-<label x="2.54" y="25.4" size="1.778" layer="95"/>
-</segment>
 <segment>
 <label x="-38.1" y="63.5" size="1.778" layer="95" rot="MR0"/>
 <pinref part="SV4" gate="1" pin="4"/>
 <wire x1="-53.34" y1="63.5" x2="-38.1" y2="63.5" width="0.1524" layer="91"/>
+</segment>
+<segment>
+<pinref part="U$1" gate="G$1" pin="PA2"/>
+<wire x1="12.7" y1="25.4" x2="0" y2="25.4" width="0.1524" layer="91"/>
+<label x="2.54" y="25.4" size="1.778" layer="95"/>
 </segment>
 </net>
 <net name="OUTPUT1" class="0">
@@ -8264,6 +8317,30 @@ http://www.micrel.com&lt;p&gt;
 <pinref part="U$1" gate="G$1" pin="PA3"/>
 <wire x1="12.7" y1="22.86" x2="0" y2="22.86" width="0.1524" layer="91"/>
 <label x="2.54" y="22.86" size="1.778" layer="95"/>
+</segment>
+</net>
+<net name="SDA" class="0">
+<segment>
+<pinref part="U1" gate="G$1" pin="SDA"/>
+<wire x1="12.7" y1="-2.54" x2="5.08" y2="-2.54" width="0.1524" layer="91"/>
+<label x="5.08" y="-2.54" size="1.778" layer="95"/>
+</segment>
+<segment>
+<pinref part="U$1" gate="G$1" pin="PB1"/>
+<wire x1="40.64" y1="27.94" x2="50.8" y2="27.94" width="0.1524" layer="91"/>
+<label x="45.72" y="27.94" size="1.778" layer="95"/>
+</segment>
+</net>
+<net name="SCL" class="0">
+<segment>
+<pinref part="U1" gate="G$1" pin="SCL"/>
+<wire x1="12.7" y1="-5.08" x2="5.08" y2="-5.08" width="0.1524" layer="91"/>
+<label x="5.08" y="-5.08" size="1.778" layer="95"/>
+</segment>
+<segment>
+<pinref part="U$1" gate="G$1" pin="PB0"/>
+<wire x1="40.64" y1="30.48" x2="50.8" y2="30.48" width="0.1524" layer="91"/>
+<label x="45.72" y="30.48" size="1.778" layer="95"/>
 </segment>
 </net>
 </nets>
