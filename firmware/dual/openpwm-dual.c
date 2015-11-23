@@ -571,8 +571,8 @@ int main(void)
           // scale rotate so that that max value 400 is now 1024
           rotate = (rotate * 5)>>4;
 
-          int16_t duty1 = forward + rotate;
-          int16_t duty2 = forward - rotate;
+          int16_t duty1 = -forward - rotate;
+          int16_t duty2 = -forward + rotate;
 
           if (stable_counter < 100)
           {
